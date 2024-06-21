@@ -34,7 +34,7 @@ func TestAddGetDelete(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "./tracker.db")
-	require.Empty(t, err, "Ошибка открытия БД - %v", err)
+	require.NoError(t, err, "Ошибка открытия БД - %v", err)
 
 	defer func(db *sql.DB) {
 		_ = db.Close()
@@ -46,14 +46,14 @@ func TestAddGetDelete(t *testing.T) {
 	// add
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
-	require.Empty(t, err, "Ошибка при добавлении в БД - %v", err)
+	require.NoError(t, err, "Ошибка при добавлении в БД - %v", err)
 
 	require.NotEmpty(t, id, "Ошибка в получении id - %v", id)
 
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	parcels, err := store.Get(id)
-	require.Empty(t, err, "Ошибка получения по id - %v", err)
+	require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
 	assert.Equal(t, parcels.Client, parcel.Client, "Ошибка parcels.Client - %v parcel.Client - %v", parcels.Client, parcel.Client)
@@ -64,18 +64,18 @@ func TestAddGetDelete(t *testing.T) {
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
 	err = store.Delete(id)
-	require.Empty(t, err, "Ошибка удаления id - %v", err)
+	require.NoError(t, err, "Ошибка удаления id - %v", err)
 
 	// проверьте, что посылку больше нельзя получить из БД
 	_, err = store.Get(id)
-	require.NotEmpty(t, err, "Ошибка запись по id - %v не удалена %v", id, err)
+	require.Error(t, err, "Ошибка запись по id - %v не удалена %v", id, err)
 }
 
 // TestSetAddress проверяет обновление адреса
 func TestSetAddress(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "./tracker.db")
-	require.Empty(t, err, "Ошибка открытия БД - %v", err)
+	require.NoError(t, err, "Ошибка открытия БД - %v", err)
 
 	defer func(db *sql.DB) {
 		_ = db.Close()
@@ -87,7 +87,7 @@ func TestSetAddress(t *testing.T) {
 	// add
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
-	require.Empty(t, err, "Ошибка при добавлении в БД - %v", err)
+	require.NoError(t, err, "Ошибка при добавлении в БД - %v", err)
 
 	require.NotEmpty(t, id, "Ошибка в получении id - %v", id)
 
@@ -96,12 +96,12 @@ func TestSetAddress(t *testing.T) {
 	newAddress := "new test address"
 
 	err = store.SetAddress(id, newAddress)
-	require.Empty(t, err, "Ошибка при изменении адреса - %v", err)
+	require.NoError(t, err, "Ошибка при изменении адреса - %v", err)
 
 	// check
 	// получите добавленную посылку и убедитесь, что адрес обновился
 	parcels, err := store.Get(id)
-	require.Empty(t, err, "Ошибка получения по id - %v", err)
+	require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 	assert.Equal(t, parcels.Address, newAddress, "Ошибка parcels.Address - %v newAddress - %v", parcels.Address, newAddress)
 }
@@ -110,7 +110,7 @@ func TestSetAddress(t *testing.T) {
 func TestSetStatus(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "./tracker.db")
-	require.Empty(t, err, "Ошибка открытия БД - %v", err)
+	require.NoError(t, err, "Ошибка открытия БД - %v", err)
 
 	defer func(db *sql.DB) {
 		_ = db.Close()
@@ -122,22 +122,22 @@ func TestSetStatus(t *testing.T) {
 	// add
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
-	require.Empty(t, err, "Ошибка при добавлении в БД - %v", err)
+	require.NoError(t, err, "Ошибка при добавлении в БД - %v", err)
 
 	require.NotEmpty(t, id, "Ошибка в получении id - %v", id)
 
 	// set status
 	// обновите статус, убедитесь в отсутствии ошибки
 	err = store.SetStatus(id, ParcelStatusSent)
-	require.Empty(t, err, "Ошибка при изменении статуса - %v", err)
+	require.NoError(t, err, "Ошибка при изменении статуса - %v", err)
 
 	err = store.SetStatus(id, ParcelStatusDelivered)
-	require.Empty(t, err, "Ошибка при изменении статуса - %v", err)
+	require.NoError(t, err, "Ошибка при изменении статуса - %v", err)
 
 	// check
 	// получите добавленную посылку и убедитесь, что статус обновился
 	parcels, err := store.Get(id)
-	require.Empty(t, err, "Ошибка получения по id - %v", err)
+	require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 	assert.Equal(t, parcels.Status, ParcelStatusDelivered, "Ошибка parcels.Status - %v ParcelStatusDelivered - %v", parcels.Status, ParcelStatusDelivered)
 }
@@ -146,7 +146,7 @@ func TestSetStatus(t *testing.T) {
 func TestGetByClient(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "./tracker.db")
-	require.Empty(t, err, "Ошибка открытия БД - %v", err)
+	require.NoError(t, err, "Ошибка открытия БД - %v", err)
 
 	defer func(db *sql.DB) {
 		_ = db.Close()
@@ -170,7 +170,7 @@ func TestGetByClient(t *testing.T) {
 	// add
 	for i := 0; i < len(parcels); i++ {
 		id, err := store.Add(parcels[i])
-		require.Empty(t, err, "Ошибка при добавлении в БД - %v", err)
+		require.NoError(t, err, "Ошибка при добавлении в БД - %v", err)
 
 		require.NotEmpty(t, id, "Ошибка в получении id - %v", id) // добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 
@@ -183,7 +183,7 @@ func TestGetByClient(t *testing.T) {
 
 	// get by client
 	storedParcels, err := store.GetByClient(client)
-	require.Empty(t, err, "Ошибка получения по id - %v", err) // получите список посылок по идентификатору клиента, сохранённого в переменной client
+	require.NoError(t, err, "Ошибка получения по id - %v", err) // получите список посылок по идентификатору клиента, сохранённого в переменной client
 	// убедитесь в отсутствии ошибки
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
 	assert.Equal(t, storedParcels, parcels, "Ошибка storedParcels - %v parcels - %v", storedParcels, parcels)
@@ -193,7 +193,7 @@ func TestGetByClient(t *testing.T) {
 		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
 		parcels, err := store.Get(parcel.Number)
-		require.Empty(t, err, "Ошибка получения по id - %v", err)
+		require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 		assert.Equal(t, parcelMap[parcel.Number], parcels, "Ошибка parcelMap[parcel.Number] - %v parcels - %v", parcelMap[parcel.Number], parcels)
 
