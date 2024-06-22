@@ -101,7 +101,7 @@ func main() {
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "./tracker.db")
 	if err != nil {
-		log.Fatalf("Error opening database: %v", err)
+		log.Fatalf("Ошибка открытия БД - %v", err)
 	}
 	defer func(db *sql.DB) {
 		_ = db.Close()
