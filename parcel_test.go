@@ -68,7 +68,7 @@ func TestAddGetDelete(t *testing.T) {
 
 	// проверьте, что посылку больше нельзя получить из БД
 	_, err = store.Get(id)
-	require.Error(t, err, "Ошибка запись по id - %v не удалена %v", id, err)
+	require.Error(t, err, "Ошибка по id - %v не удалена %v", id, err)
 }
 
 // TestSetAddress проверяет обновление адреса
