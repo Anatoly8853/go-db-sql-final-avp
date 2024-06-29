@@ -26,12 +26,12 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 		return 0, err
 	}
 
-	id64, err := result.LastInsertId()
+	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
 
-	return int(id64), nil
+	return int(id), nil
 }
 
 func (s ParcelStore) Get(number int) (Parcel, error) {
@@ -56,6 +56,7 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	// здесь из таблицы может вернуться несколько строк
 	query := `SELECT number, client, status, address, created_at FROM parcel WHERE client = :client`
 	rows, err := s.db.Query(query, sql.Named("client", client))
+
 	if err != nil {
 		return nil, err
 	}

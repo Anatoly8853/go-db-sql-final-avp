@@ -56,10 +56,7 @@ func TestAddGetDelete(t *testing.T) {
 	require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
-	assert.Equal(t, parcels.Client, parcel.Client, "Ошибка parcels.Client - %v parcel.Client - %v", parcels.Client, parcel.Client)
-	assert.Equal(t, parcels.Status, parcel.Status, "Ошибка parcels.Status - %v parcel.Status - %v", parcels.Status, parcel.Status)
-	assert.Equal(t, parcels.Address, parcel.Address, "Ошибка parcels.Address - %v parcel.Address - %v", parcels.Address, parcel.Address)
-	assert.Equal(t, parcels.CreatedAt, parcel.CreatedAt, "Ошибка parcels.CreatedAt - %v parcel.CreatedAt - %v", parcels.CreatedAt, parcel.CreatedAt)
+	assert.Equal(t, parcels, parcel)
 
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
@@ -186,28 +183,18 @@ func TestGetByClient(t *testing.T) {
 	require.NoError(t, err, "Ошибка получения по id - %v", err) // получите список посылок по идентификатору клиента, сохранённого в переменной client
 	// убедитесь в отсутствии ошибки
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	assert.Equal(t, storedParcels, parcels, "Ошибка storedParcels - %v parcels - %v", storedParcels, parcels)
+	require.Equal(t, len(parcelMap), storedParcels)
+	require.NotEmpty(t, storedParcels)
 
 	// check
 	for _, parcel := range storedParcels {
 		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
-		parcels, err := store.Get(parcel.Number)
-		require.NoError(t, err, "Ошибка получения по id - %v", err)
-
-		assert.Equal(t, parcelMap[parcel.Number], parcels, "Ошибка parcelMap[parcel.Number] - %v parcels - %v", parcelMap[parcel.Number], parcels)
-
-		// убедитесь, что значения полей полученных посылок заполнены верно
-		assert.NotEmpty(t, parcels.Number, "Ошибка parcels.Number - %v", parcels.Number)
-		assert.NotEmpty(t, parcels.Client, "Ошибка parcels.Client - %v", parcels.Client)
-		assert.Equal(t, parcels.Status, "registered", "Ошибка parcels.Statust - %v registered", parcels.Status)
-		assert.Equal(t, parcels.Address, "test", "Ошибка parcels.Address - %v test", parcels.Address)
-		assert.NotEmpty(t, isValidRFC3339(parcels.CreatedAt), "Ошибка parcels.CreatedAt - %v", parcels.CreatedAt)
+		require.NotEmpty(t, parcelMap)
+		require.Equal(t, len(parcelMap), len(storedParcels))
+		for i := 0; i < len(parcelMap); i++ {
+			require.Equal(t, parcel, parcelMap[i])
+		}
 
 	}
-}
-
-func isValidRFC3339(dateStr string) bool {
-	_, err := time.Parse(time.RFC3339, dateStr)
-	return err == nil
 }
