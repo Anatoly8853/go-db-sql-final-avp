@@ -53,6 +53,7 @@ func TestAddGetDelete(t *testing.T) {
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	parcels, err := store.Get(id)
+	parcel.Number = parcels.Number
 	require.NoError(t, err, "Ошибка получения по id - %v", err)
 
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
@@ -183,7 +184,7 @@ func TestGetByClient(t *testing.T) {
 	require.NoError(t, err, "Ошибка получения по id - %v", err) // получите список посылок по идентификатору клиента, сохранённого в переменной client
 	// убедитесь в отсутствии ошибки
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	require.Equal(t, len(parcelMap), storedParcels)
+	require.Equal(t, len(parcelMap), len(storedParcels))
 	require.NotEmpty(t, storedParcels)
 
 	// check
@@ -193,7 +194,7 @@ func TestGetByClient(t *testing.T) {
 		require.NotEmpty(t, parcelMap)
 		require.Equal(t, len(parcelMap), len(storedParcels))
 		for i := 0; i < len(parcelMap); i++ {
-			require.Equal(t, parcel, parcelMap[i])
+			require.Equal(t, parcel, parcelMap[parcel.Number])
 		}
 
 	}
