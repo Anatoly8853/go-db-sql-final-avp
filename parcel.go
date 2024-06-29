@@ -61,6 +61,12 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 		return nil, err
 	}
 
+	defer rows.Close()
+	//Close closes the Rows, preventing further enumeration.
+	//If Rows.Next is called and returns false and there are no further result sets,
+	//the Rows are closed automatically and it will suffice to check the result of Rows.Err.
+	//Close is idempotent and does not affect the result of Rows.Er
+
 	// заполните срез Parcel данными из таблицы
 	var res []Parcel
 
