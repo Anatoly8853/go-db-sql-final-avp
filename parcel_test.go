@@ -161,41 +161,31 @@ func TestGetByClient(t *testing.T) {
 
 	// задаём всем посылкам один и тот же идентификатор клиента
 	client := randRange.Intn(10_000_000)
-	parcels[0].Client = client
-	parcels[1].Client = client
-	parcels[2].Client = client
+	for i := range parcels {
+		parcels[i].Client = client
+	}
 
 	// add
-	for i := 0; i < len(parcels); i++ {
-		id, err := store.Add(parcels[i])
+	for i, parcel := range parcels {
+		id, err := store.Add(parcel)
 		require.NoError(t, err, "Ошибка при добавлении в БД - %v", err)
+		require.NotEmpty(t, id, "Ошибка в получении id - %v", id)
 
-		require.NotEmpty(t, id, "Ошибка в получении id - %v", id) // добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
-
-		// обновляем идентификатор добавленной у посылки
+		// обновляем идентификатор добавленной посылки
 		parcels[i].Number = id
-
-		// сохраняем добавленную посылку в структуру map, чтобы её можно было легко достать по идентификатору посылки
 		parcelMap[id] = parcels[i]
 	}
 
 	// get by client
 	storedParcels, err := store.GetByClient(client)
-	require.NoError(t, err, "Ошибка получения по id - %v", err) // получите список посылок по идентификатору клиента, сохранённого в переменной client
-	// убедитесь в отсутствии ошибки
-	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
+	require.NoError(t, err, "Ошибка получения по id - %v", err)
 	require.Equal(t, len(parcelMap), len(storedParcels))
 	require.NotEmpty(t, storedParcels)
 
 	// check
 	for _, parcel := range storedParcels {
-		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
-		// убедитесь, что все посылки из storedParcels есть в parcelMap
-		require.NotEmpty(t, parcelMap)
-		require.Equal(t, len(parcelMap), len(storedParcels))
-		for i := 0; i < len(parcelMap); i++ {
-			require.Equal(t, parcel, parcelMap[parcel.Number])
-		}
-
+		expectedParcel, found := parcelMap[parcel.Number]
+		require.True(t, found, "Посылка не найдена в map")
+		require.Equal(t, expectedParcel, parcel)
 	}
 }
